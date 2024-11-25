@@ -481,6 +481,22 @@
             this.updateMonthsInView();
         },
 
+        setMinDate: function(minDate) {
+            if (typeof minDate === 'string')
+                this.minDate = moment(minDate, this.locale.format);
+
+            if (typeof minDate === 'object')
+                this.minDate = moment(minDate);
+        },
+
+        setMaxDate: function(maxDate) {
+            if (typeof maxDate === 'string')
+                this.maxDate = moment(maxDate, this.locale.format);
+
+            if (typeof maxDate === 'object')
+                this.maxDate = moment(maxDate);
+        },
+
         setEndDate: function(endDate) {
             if (typeof endDate === 'string')
                 this.endDate = moment(endDate, this.locale.format);
@@ -1324,10 +1340,12 @@
                 }
                 this.endDate = null;
                 this.setStartDate(date.clone());
+                this.element.trigger('selected.date.start.daterangepicker', [date.clone(), this]);
             } else if (!this.endDate && date.isBefore(this.startDate)) {
                 //special case: clicking the same date for start/end,
                 //but the time of the end date is before the start date
                 this.setEndDate(this.startDate.clone());
+                this.element.trigger('selected.date.end.daterangepicker', [date.clone(), this]);
             } else { // picking end
                 if (this.timePicker) {
                     var hour = parseInt(this.container.find('.right .hourselect').val(), 10);
@@ -1346,6 +1364,7 @@
                     date = date.clone().hour(hour).minute(minute).second(second);
                 }
                 this.setEndDate(date.clone());
+                this.element.trigger('selected.date.end.daterangepicker', [date.clone(), this]);
                 if (this.autoApply) {
                   this.calculateChosenLabel();
                   this.clickApply();
@@ -1369,7 +1388,7 @@
             var customRange = true;
             var i = 0;
             for (var range in this.ranges) {
-              if (this.timePicker) {
+                if (this.timePicker) {
                     var format = this.timePickerSeconds ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD HH:mm";
                     //ignore times when comparing dates if time picker seconds is not enabled
                     if (this.startDate.format(format) == this.ranges[range][0].format(format) && this.endDate.format(format) == this.ranges[range][1].format(format)) {
